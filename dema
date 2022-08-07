@@ -1,0 +1,31 @@
+#!/bin/bash
+
+echo "start compile..."
+
+g++ -I/G/Qt64-5.0.1/include -I/G/Qt64-5.0.1/include/QtCore -I/G/Qt64-5.0.1/include/QtWidgets \
+    -shared -fPIC -S QObject_GNU.cc
+
+g++ -o QObject_GNU.o -c QObject_GNU.s
+
+myout=$(objdump -t QObject_GNU.o | grep "(sec  1" | awk '{print $(NF)}')
+
+myarray=($myout)
+for (( i=0; i<=${#myarray[@]}; i++ )); do
+    cpp=$(c++filt "${myarray[$i]}")
+    echo "--> ${myarray[$i]}   -   ${cpp}"
+done
+
+gcc -shared -fPIC -o memory.o -c memory.cc
+
+echo "create .dll file:"
+g++ -shared -fPIC -o fpc_qt5.dll -L/G/Qt64-5.0.1/lib \
+     QObject_GNU.o memory.o \
+    -lQt5Core \
+    -lQt5Widgets \
+    -lUtils \
+    -lQt5UiTools -lstdc++
+
+echo "create import library .a file:"
+dlltool --def fpc_qt5.def --dllname fpc_qt5.dll --output-lib libfpc_qt5.a
+
+echo "done."
