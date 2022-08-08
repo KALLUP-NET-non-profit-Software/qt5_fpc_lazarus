@@ -32,14 +32,17 @@ type
   // the Qt framework ...
   // ---------------------------------------------
   QObject = class(QClass)
-  protected
-    Sender: QObject;
-    SenderSignalIndex: Integer;
+  private
+    //Sender: QObject;
+    //SenderSignalIndex: Integer;
   public
     constructor Create(parent: QObject); overload;
     constructor Create; overload;
 
     destructor Destroy; override;
+  public
+    function blockSignals(block: Boolean): Boolean;
+    function signalsBlocked: Boolean;
   end;
 
 implementation
@@ -50,8 +53,10 @@ implementation
 // ----------------------------------------------------------------------------
 function  QObject_Create:                          Pointer; cdecl; external fpc_qt5Lib name '_ZN11GNU_QObjectC2Ev';
 function  QObject_QObject_Create(parent: QObject): Pointer; cdecl; external fpc_qt5Lib name '_ZN11GNU_QObjectC2EPS_';
+function  QObject_blockSignals(block: PChar):      Pointer; cdecl; external fpc_qt5Lib name '_ZN11GNU_QObject16GNU_blockSignalsEb';
+function  QObject_signalsBlocked:                  Pointer; cdecl; external fpc_qt5Lib name '_ZN11GNU_QObject18GNU_signalsBlockedEv';
 
-procedure QObject_Destory(obj: Pointer); cdecl; external fpc_qt5Lib name '_ZN11GNU_QObjectD2Ev';
+procedure QObject_Destory(obj: Pointer);                    cdecl; external fpc_qt5Lib name '_ZN11GNU_QObjectD2Ev';
 
 const
   cstr_QObject = 'QObject';
@@ -95,6 +100,26 @@ begin
     exit;
   end;
   ClassName := cstr_QObject;
+  blockSignals(false);
+  (*if signalsBlocked = false then
+  begin
+    MessageBoxA(0,PChar('xxxxx'),'warning',0)
+  end;*)
+end;
+
+function QObject.blockSignals(block: Boolean): Boolean;
+var
+  res : PChar;
+begin
+  if block = false then
+  res := QObject_blockSignals('f');
+  if res = PChar('f') then
+  result := false;
+end;
+
+function QObject.signalsBlocked: Boolean;
+begin
+  result := PBool(QObject_signalsBlocked)^;
 end;
 
 // ----------------------------------------------------------------------------

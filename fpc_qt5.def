@@ -47,8 +47,10 @@ _ZN12QApplicationC2Ev          ; constructor:  QApplication()
 ; @brief  The following section part deepend on context source:
 ;         QObject -> QObject_GNU.cc
 ;-----------------------------------------------------------------------------
-_ZN11GNU_QObjectC2Ev           ; constructor:  QObject()
-_ZN11GNU_QObjectC2EPS_         ;               QObject(parent: QObject)
+_ZN11GNU_QObjectC2Ev                        ; constructor:  QObject()
+_ZN11GNU_QObjectC2EPS_                      ;               QObject(parent: QObject)
+_ZN11GNU_QObject16GNU_blockSignalsEb        ; bool blockSignals   (bool block)
+_ZN11GNU_QObject18GNU_signalsBlockedEv      ; bool signalsBlocked (void)
 
 ;-----------------------------------------------------------------------------
 ; @brief  The following section part deepend on context source:

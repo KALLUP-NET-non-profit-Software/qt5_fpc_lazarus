@@ -13,6 +13,7 @@
 //              to depth into the magic of gui programming with FPC-OOP
 // ----------------------------------------------------------------------------
 {$mode delphi}{$H+}
+{$typedaddress on}
 unit qt5.QtGlobal;
 
 interface
@@ -22,6 +23,9 @@ const fpc_qt5Lib = 'fpc_qt5.dll';
 {$ELSE}
 const fpc_qt5Lib = 'fpc_qt5.so';
 {$ENDIF}
+
+type
+  bool = Boolean;
 
 implementation
 

@@ -18,8 +18,9 @@ done
 gcc -shared -fPIC -o memory.o -c memory.cc
 
 echo "create .dll file:"
+g++ -shared -fPIC -o qt5.main.o -c qt5.main.cc
 g++ -shared -fPIC -o fpc_qt5.dll -L/G/Qt64-5.0.1/lib \
-     QObject_GNU.o memory.o \
+     qt5.main.o QObject_GNU.o memory.o -Wl,-eDllMainEntry \
     -lQt5Core \
     -lQt5Widgets \
     -lUtils \
