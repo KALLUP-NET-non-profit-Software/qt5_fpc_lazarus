@@ -49,7 +49,7 @@ _ZN12QApplicationC2Ev          ; constructor:  QApplication()
 ;-----------------------------------------------------------------------------
 _ZN11GNU_QObjectC2Ev                        ; constructor:  QObject()
 _ZN11GNU_QObjectC2EPS_                      ;               QObject(parent: QObject)
-_ZN11GNU_QObject16GNU_blockSignalsEb        ; bool blockSignals   (bool block)
+_ZN11GNU_QObject16GNU_blockSignalsEh        ; bool blockSignals   (bool block)
 _ZN11GNU_QObject18GNU_signalsBlockedEv      ; bool signalsBlocked (void)
 
 ;-----------------------------------------------------------------------------

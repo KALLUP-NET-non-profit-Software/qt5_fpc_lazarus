@@ -41,8 +41,8 @@ type
 
     destructor Destroy; override;
   public
-    function blockSignals(block: Boolean): Boolean;
-    function signalsBlocked: Boolean;
+    function blockSignals(ABool: ByteBool): ByteBool;
+    function signalsBlocked: ByteBool;
   end;
 
 implementation
@@ -51,10 +51,10 @@ implementation
 // some magic is put in pascal files, and some other magic is put in cpp files.
 // You will need the libraries and other tools from the Qt5 GUI-framework...
 // ----------------------------------------------------------------------------
-function  QObject_Create:                          Pointer; cdecl; external fpc_qt5Lib name '_ZN11GNU_QObjectC2Ev';
-function  QObject_QObject_Create(parent: QObject): Pointer; cdecl; external fpc_qt5Lib name '_ZN11GNU_QObjectC2EPS_';
-function  QObject_blockSignals(block: PChar):      Pointer; cdecl; external fpc_qt5Lib name '_ZN11GNU_QObject16GNU_blockSignalsEb';
-function  QObject_signalsBlocked:                  Pointer; cdecl; external fpc_qt5Lib name '_ZN11GNU_QObject18GNU_signalsBlockedEv';
+function  QObject_Create:                          Pointer ; cdecl; external fpc_qt5Lib name '_ZN11GNU_QObjectC2Ev';
+function  QObject_QObject_Create(parent: QObject): Pointer ; cdecl; external fpc_qt5Lib name '_ZN11GNU_QObjectC2EPS_';
+function  QObject_blockSignals(ABool: ByteBool):   ByteBool; cdecl; external fpc_qt5Lib name '_ZN11GNU_QObject16GNU_blockSignalsEh';
+function  QObject_signalsBlocked:                  ByteBool; cdecl; external fpc_qt5Lib name '_ZN11GNU_QObject18GNU_signalsBlockedEv';
 
 procedure QObject_Destory(obj: Pointer);                    cdecl; external fpc_qt5Lib name '_ZN11GNU_QObjectD2Ev';
 
@@ -100,26 +100,21 @@ begin
     exit;
   end;
   ClassName := cstr_QObject;
-  blockSignals(false);
+  blockSignals(true);
   (*if signalsBlocked = false then
   begin
     MessageBoxA(0,PChar('xxxxx'),'warning',0)
   end;*)
 end;
 
-function QObject.blockSignals(block: Boolean): Boolean;
-var
-  res : PChar;
+function QObject.blockSignals(ABool: ByteBool): ByteBool;
 begin
-  if block = false then
-  res := QObject_blockSignals('f');
-  if res = PChar('f') then
-  result := false;
+  result := QObject_blockSignals(ABool);
 end;
 
-function QObject.signalsBlocked: Boolean;
+function QObject.signalsBlocked: ByteBool;
 begin
-  result := PBool(QObject_signalsBlocked)^;
+  result := QObject_signalsBlocked;
 end;
 
 // ----------------------------------------------------------------------------
