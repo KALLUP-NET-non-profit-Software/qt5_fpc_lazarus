@@ -18,7 +18,7 @@ unit qt5.QObject;
 interface
 
 uses
-  Windows, qt5.QtGlobal;
+  qt5.QtGlobal;
 
 type
   QClass = class
@@ -56,16 +56,17 @@ function  QObject_QObject_Create(parent: QObject): Pointer ; cdecl; external fpc
 function  QObject_blockSignals(ABool: ByteBool):   ByteBool; cdecl; external fpc_qt5Lib name '_ZN11GNU_QObject16GNU_blockSignalsEh';
 function  QObject_signalsBlocked:                  ByteBool; cdecl; external fpc_qt5Lib name '_ZN11GNU_QObject18GNU_signalsBlockedEv';
 
-procedure QObject_Destory(obj: Pointer);                    cdecl; external fpc_qt5Lib name '_ZN11GNU_QObjectD2Ev';
+procedure QObject_Destory(obj: Pointer);                     cdecl; external fpc_qt5Lib name '_ZN11GNU_QObjectD2Ev';
 
 const
   cstr_QObject = 'QObject';
 
 procedure displayError(AString: String);
 begin
-  MessageBoxA(0, PChar('Error:' +
+
+  (*MessageBoxA(0, PChar('Error:' +
   #13#10 + 'Could not allocate memory for:' +
-  #13#10 + AString + ' class.'),'Warning.',0);
+  #13#10 + AString + ' class.'),'Warning.',0);*)
 end;
 
 // ----------------------------------------------------------------------------
