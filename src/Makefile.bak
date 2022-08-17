@@ -78,7 +78,7 @@ STRIP     = strip
 # gnu c/c++ speciefied compiler flags.
 # default: win64
 # ----------------------------------------
-CFLAGS    = -m64 -I. -O2 -DWINDOWS -L$(DEV_QTDIR)/lib
+CFLAGS    = -m64 -I. -O2 -DWINDOWS
 FPC_FLAGS = -l- -Ur -WN -O2
 GDB_FLAGS = -ggdb
 
@@ -171,10 +171,7 @@ endef
 # ------------------------------------------------------
 define make_dll    =
 	@$(call Write,$(MAKE_CREATE1) DLL $(1) ...)
-	@$(GXX) $(CFLAGS) -shared -fPIC -o $(1) $(2) \
-    -lQt5Core    \
-    -lQt5Widgets \
-    -lQt5UiTools -lstdc++
+	@$(GXX) $(CFLAGS) -shared -fPIC -o $(1) $(2)
 endef
 
 define pas_compile =
