@@ -1,10 +1,13 @@
 # ----------------------------------------------------------------
-# This file is part of RTL.
+# This Makefile is part of RTL.
 #
 # (c) Copyright 2022 Jens Kallup - paule32
 # only for non-profit usage !!!
+#
+# You should use the script: build.sh to use this Makefile right !
+# I have assume GNU make.exe; but other Makefile tools can differ.
 # ----------------------------------------------------------------
-.all:                    build
+.all:   build
 .PHONY: clean boot check build
 
 # --------------------------------------------------
@@ -12,12 +15,16 @@
 # you have to set on your own ...
 # --------------------------------------------------
 FPC_DIR   = C:/Lazarus/fpc/3.2.2/bin/x86_64-win64
-DEV_PWD   = E:/Projekte/extern
+DEV_PWD   = $(shell pwd)
+DEV_DRV   = E
 
-GCC       = gcc              # i used MinGW-64 10.0.0
-GXX       = g++              # ...
-FPC       = $(FPC_DIR)/fpc   # tests with 3.2.2
-GDB       = gdb              # command line
+# ---------------------------------------------------------
+# V marks the letter's that you have to change if you work
+# under Windows 10.
+# Note: the : after the drive definiton !
+# ---------------------------------------------------------
+#                      V            V
+DEV_DRIVE = 's/^\/$(DEV_DRV)\//$(DEV_DRV)\:\//gi'
 
 DEV_TERM  = $(shell echo $$MSYSTEM)
 DEV_OS    = $(shell echo $$OS)
@@ -25,6 +32,14 @@ DEV_LANG  = $(shell powershell get-uiculture | grep de | awk '{print $$2}')
 
 DEV_CCVER = $(shell $(GCC) -dumpversion | cut -f1 -d.)
 DEV_PPVER = $(shell $(GXX) -dumpversion | cut -f1 -d.)
+
+# ---------------------------------------------------------
+# compiler section:
+# ---------------------------------------------------------
+GCC       = gcc              # i used MinGW-64 10.0.0
+GXX       = g++              # ...
+FPC       = $(FPC_DIR)/fpc   # tests with 3.2.2
+GDB       = gdb              # command line
 
 # ---------------------------------------------------------
 # determine the gcc version level. the smallest supported
@@ -87,25 +102,28 @@ INCLUDE  = $(CPP_SRC)/inc
 
 CFLAGS    += \
 	-I$(INCLUDE)
-FPC_FLAGS +=
+    
+FPC_FLAGS += -Fu$(PAS_SRC)/qt5
 
 # -------------------------------------
 # the entiere source files ...
 # -------------------------------------
 CPP_SRC_FILES = \
-	$(CPP_SRC)/qt5/qt5.QObject.cc
+	$(CPP_SRC)/qt5/QObject.cc
+
 #
 PAS_SRC_FILES = \
-	$(PAS_SRC)/qt5/qt5.QObject.pas
+	$(PAS_SRC)/qt5/QObject.pas
 
 # -------------------------------------
 # the corresponding .o bject files ...
 # -------------------------------------
 CPP_OBJ_FILES = \
-	$(CPP_OUT)/qt5/qt5.QObject.o
+	$(CPP_OUT)/qt5/QObject.o
+
 #
 PAS_OBJ_FILES = \
-    $(PAS_OUT)/qt5/qt5.QObject.o
+    $(PAS_OUT)/qt5/QObject.o
 
 SRC_FILES = $(CPP_SRC_FILES) $(PAS_SRC_FILES)
 OBJ_FILES = $(CPP_OBJ_FILES) $(PAS_OBJ_FILES)
@@ -114,7 +132,7 @@ OBJ_FILES = $(CPP_OBJ_FILES) $(PAS_OBJ_FILES)
 # now, hand sorted .dll .o bject files ...
 # ------------------------------------------
 QT5_DLLOF = \
-	$(CPP_OUT)/qt5/qt5.QObject.o
+	$(CPP_OUT)/qt5/QObject.o
 
 # ---------------------------------------------------------------------
 # i hard hand-code the .def file, because the automatic
@@ -132,10 +150,10 @@ endef
 # --------------------------------------------------------
 define dll_a =
 	@dlltool \
-		--def        $(subst /,\\\,$(2))                    \
-		--dllname    $(subst /,\\\,$(subst .def,.dll,$(2))) \
-		--output-lib $(subst /,\\\,$(1)) > /dev/null 2>&1
-	@$(STRIP)        $(subst /,\\\,$(subst .def,.dll,$(2)))
+		--def        $(subst /,\,$(shell echo $(2) | sed $(DEV_DRIVE))) \
+		--dllname    $(subst /,\,$(subst .def,.dll,$(shell echo $(2) | sed $(DEV_DRIVE)))) \
+		--output-lib $(subst /,\,$(shell echo $(1) | sed $(DEV_DRIVE)))
+	@$(STRIP)        $(subst /,\,$(subst .def,.dll,$(shell echo $(2) | sed $(DEV_DRIVE))))
 endef
 
 # ------------------------------------------------------
@@ -145,7 +163,7 @@ endef
 # .o bject's in parameter 2.
 # ------------------------------------------------------
 define make_dll    =
-	@$(ECHO) $(MAKE_CREATE1) DLL $(subst /,\,$(1)) ...
+	@$(call Write,$(MAKE_CREATE1) DLL $(1) ...)
 	@$(GXX) $(CFLAGS) -shared -fPIC -o $(1) $(2)
 endef
 
@@ -154,7 +172,7 @@ define pas_compile =
 endef
 
 define cc_compile  =
- 	@$(GXX) $(CFLAGS) -shared -fPIC -o $(1) -c $(2)
+	@$(GXX) $(CFLAGS) -shared -fPIC -o $(1) -c $(2)
 endef
 
 # ------------------------------------------------------
@@ -208,6 +226,7 @@ $(CPP_OUT)/qt5/%.o: $(CPP_SRC)/qt5/%.cc ; $(call cc_compile,$@,$<)
 compile: compile_notice                     \
 	$(SRC_FILES) $(OBJ_FILES)               \
 	$(DLL_FILES) $(DEF_FILES) $(ALD_FILES)
+
 compile_notice:
 	@$(call Write,$(MAKE_COMNOTE))
 
@@ -220,20 +239,28 @@ build: check clean boot compile
 # ---------------------------------------------
 check:
 	@$(call Write,$(MAKE_WELCOME))
-	@$(call Write,$(MAKE_CHKSYS)"\\\n")
+	@$(call Write,$(MAKE_CHKSYS))
 ifndef DEV_TERM
 	@$(call WriteError,"$(MAKE_WRONGP)$(MAKE_NL)$(MAKE_ABORT))
 else
+    # ---------------------------------------------------------
+    # here, we are under Windows 10 ... ?
+    # ---------------------------------------------------------
     ifeq ("$(findstring Windows,$(DEV_OS))","Windows")
         ifeq ("$(DEV_TERM)","MINGW632")
-			$(call WriteError,"32 bit version" $(MAKE_NOSUPP))
+			@$(call WriteError,"32 bit version" $(MAKE_NOSUPP))
         endif
         ifeq ("$(DEV_TERM)","MINGW64")
 			@$(call WriteSuccess,\
-			@$(call Write,$(call moveback,$(MAKE_SUCCOK))))
+			$(call Write,$(call moveback,$(MAKE_SUCCOK))))
         else
 			@$(call WriteError,$(MAKE_NOSFRM))
         endif
+        # ---------------------------------------------------------
+        # in earlier step, we check, if the gcc version not under
+        # the level 7. But if so, warn the developer of this issue
+        # for both compilers: gcc (.c), and g++ (.cc) compiler.
+        # ---------------------------------------------------------
         ifeq ($(GCC_FOUND),0)
 			@$(call WriteError,$(MAKE_NOCC))
         endif
@@ -367,7 +394,7 @@ CHAR_MINOE  = "\\\u00f6"
 CHAR_MINUE  = "\\\u00fc"
 CHAR_MINSZ  = "\\\u00df"
 endif
-MAKE_NL     = "\\\n"
+MAKE_NL     = "\\n"
 MAKE_COMMA  = ","
 MAKE_OKAY   = "ok"$(MAKE_COMMA)
 
@@ -375,10 +402,10 @@ MAKE_OKAY   = "ok"$(MAKE_COMMA)
 # this section describe the terminal colors that you
 # can use, if you have ANSI supported console ...
 # --------------------------------------------------
-color_normal = "\\033[0;37;40m"
-color_error  = "\\033[1;37;44m"
-color_info   = "\\033[1;93;40m"
-color_white  = "\\033[1;37;40m"
+color_normal = "\033[0;37;40m"
+color_error  = "\033[1;37;44m"
+color_info   = "\033[1;93;40m"
+color_white  = "\033[1;37;40m"
 
 # --------------------------------------------------
 # this section provide internal use tool functions:
@@ -389,8 +416,7 @@ color_white  = "\\033[1;37;40m"
 # write the string $(1) on terminal device ...
 # --------------------------------------------------
 define Write
-    echo -e \
-    $(subst ü,$(CHAR_MINUE),\
+    echo -e $(subst ü,$(CHAR_MINUE),\
     $(subst ö,$(CHAR_MINOE),\
     $(subst ä,$(CHAR_MINAE),\
     $(subst Ü,$(CHAR_BIGUE),\
@@ -405,7 +431,7 @@ endef
 # to the start column of the terninal device ...
 # --------------------------------------------------
 define moveback
-    "\\\033[2K\\\r"$(1)
+	"\\r"$(1)
 endef
 
 # --------------------------------------------------

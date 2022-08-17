@@ -14,7 +14,7 @@
 // ----------------------------------------------------------------------------
 {$mode delphi}{$H+}
 {$typedaddress on}
-unit qt5.QtGlobal;
+unit QGlobal;
 
 interface
 

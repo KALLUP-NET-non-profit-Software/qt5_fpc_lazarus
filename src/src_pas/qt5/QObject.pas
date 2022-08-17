@@ -13,12 +13,12 @@
 //              to depth into the magic of gui programming with FPC-OOP
 // ----------------------------------------------------------------------------
 {$mode delphi}{$H+}
-unit qt5.QObject;
+unit QObject;
 
 interface
 
 uses
-  qt5.QtGlobal;
+  QGlobal;
 
 type
   QClass = class
