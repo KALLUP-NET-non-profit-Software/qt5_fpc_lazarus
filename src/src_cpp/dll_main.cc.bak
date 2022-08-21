@@ -53,6 +53,8 @@ extern "C" DWORD DllGetClassObject(REFCLSIID rciid, REFIID riid, IUnknown **ppv)
     return res;
 }
 
+extern "C"
+__declspec(dllexport)
 extern "C" BOOL
 #if defined(WINDOWS) || defined(__WIN64) || defined(__MINGW64__)
 DllMain(

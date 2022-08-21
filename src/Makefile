@@ -14,8 +14,8 @@
 # this section is user/developer speciefic.
 # you have to set on your own ...
 # --------------------------------------------------
-FPC_DIR   = C:/Lazarus/fpc/3.2.2/bin/x86_64-win64
-DEV_QTDIR = /e/Qt64-5.0.1
+FPC_DIR   = C:\Lazarus\fpc\3.2.2\bin\x86_64-win64
+DEV_QTDIR = E:\Qt64-5.0.1
 DEV_PWD   = $(shell pwd)
 DEV_DRV   = E
 
@@ -39,7 +39,7 @@ DEV_PPVER = $(shell $(GXX) -dumpversion | cut -f1 -d.)
 # ---------------------------------------------------------
 GCC       = gcc              # i used MinGW-64 10.0.0
 GXX       = g++              # ...
-FPC       = $(FPC_DIR)/fpc   # tests with 3.2.2
+FPC       = $(FPC_DIR)\fpc   # tests with 3.2.2
 GDB       = gdb              # command line
 
 # ---------------------------------------------------------
@@ -48,21 +48,37 @@ GDB       = gdb              # command line
 # ---------------------------------------------------------
 GCC_FOUND = 0
 ifeq ($(shell [[ $(DEV_CCVER) == 10 && $(DEV_PPVER) == 10 ]] && echo true),true)
-GCC_FOUND = 1
-GXX_FOUND = 1
+  GCC_FOUND = 1
+  GXX_FOUND = 1
 endif
 ifeq ($(shell [[ $(DEV_CCVER) ==  9 && $(DEV_PPVER) ==  9 ]] && echo true),true)
-GCC_FOUND = 1
-GXX_FOUND = 1
+  GCC_FOUND = 1
+  GXX_FOUND = 1
 endif
 ifeq ($(shell [[ $(DEV_CCVER) ==  8 && $(DEV_PPVER) ==  8 ]] && echo true),true)
-GCC_FOUND = 1
-GXX_FOUND = 1
+  GCC_FOUND = 1
+  GXX_FOUND = 1
 endif
 ifeq ($(shell [[ $(DEV_CCVER) ==  7 && $(DEV_PPVER) ==  7 ]] && echo true),true)
-GCC_FOUND = 1
-GXX_FOUND = 1
+  GCC_FOUND = 1
+  GXX_FOUND = 1
 endif
+
+# ---------------------------------------------------------
+# define the upper and lower cased characters
+# ---------------------------------------------------------
+luc_JOIN ::= ,
+
+lc_CHARS ::= a b c d e f g h i j k l m n o p q r s t u v w x y z
+uc_CHARS ::= A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+
+lc_TABLE ::= $(join $(uc_CHARS),$(addprefix $(luc_JOIN),$(lc_CHARS)))
+uc_TABLE ::= $(join $(lc_CHARS),$(addprefix $(luc_JOIN),$(uc_CHARS)))
+
+luc_internal = $(if $1,$$(subst $(firstword $1),$(call luc_internal,$(wordlist 2,$(words $1),$1),$2)),$2)
+
+lowerCase = $(eval lc_RESULT ::= $(call luc_internal,$(lc_TABLE),$1))$(lc_RESULT)
+upperCase = $(eval uc_RESULT ::= $(call luc_internal,$(uc_TABLE),$1))$(uc_RESULT)
 
 # ---------------------------------------------------------
 # the command's below should be come with the MinGW Utils.
@@ -78,7 +94,8 @@ STRIP     = strip
 # gnu c/c++ speciefied compiler flags.
 # default: win64
 # ----------------------------------------
-CFLAGS    = -m64 -I. -O2 -DWINDOWS -L$(DEV_QTDIR)/lib
+CFLAGS    = -m64 -std=c++2a -I. -O2 -Wfatal-errors \
+            -shared -fPIC -DWINDOWS
 FPC_FLAGS = -l- -Ur -WN -O2
 GDB_FLAGS = -ggdb
 
@@ -104,19 +121,30 @@ CPP_OUT  = $(OBJ_DIR)/src_cpp
 # ----------------------------------------
 INCLUDE  = $(CPP_SRC)/inc
 
-CFLAGS  += \
-	-I$(INCLUDE) \
+CINCLUDE =                 \
+    -I$(CPP_SRC)/inc       \
+	-I$(INCLUDE)           \
     -I$(DEV_QTDIR)/include \
     -I$(DEV_QTDIR)/include/QtCore
     
-FPC_FLAGS += -Fu$(PAS_SRC)/qt5
+CLIB_FLAGS = -L$(DEV_QTDIR)/lib
+
+FPC_FLAGS += -Fusrc_pas\qt5 -FUdll_x64\units
 
 # -------------------------------------
 # the entiere source files ...
 # -------------------------------------
-CPP_SRC_FILES = \
-	$(CPP_SRC)/qt5/QObject.cc \
-    $(CPP_SRC)/qt5/dll_main.cc
+CPP_SRC_FILES =                  \
+	$(CPP_SRC)/qt5/QObject.cc    \
+    $(CPP_SRC)/dll_main.cc       \
+    pas_test/modtest.cc              \
+    \
+    $(CPP_SRC)/vcl/TObject.cc    \
+    $(CPP_SRC)/vcl/TException.cc \
+    $(CPP_SRC)/vcl/TClass.cc     \
+    \
+    $(CPP_SRC)/vcl/IUnknown.cc   \
+    $(CPP_SRC)/vcl/ISomething.cc
 
 #
 PAS_SRC_FILES = \
@@ -125,9 +153,17 @@ PAS_SRC_FILES = \
 # -------------------------------------
 # the corresponding .o bject files ...
 # -------------------------------------
-CPP_OBJ_FILES = \
-	$(CPP_OUT)/qt5/QObject.o \
-    $(CPP_OUT)/qt5/dll_main.o
+CPP_OBJ_FILES =                  \
+	$(CPP_OUT)/qt5/QObject.o     \
+    $(CPP_OUT)/dll_main.o        \
+    $(CPP_OUT)/modtest.o    \
+    \
+    $(CPP_OUT)/vcl/TObject.o     \
+    $(CPP_OUT)/vcl/TException.o  \
+    $(CPP_OUT)/vcl/TClass.o      \
+    \
+    $(CPP_OUT)/vcl/IUnknown.o    \
+    $(CPP_OUT)/vcl/ISomething.o
 
 #
 PAS_OBJ_FILES = \
@@ -170,19 +206,20 @@ endef
 # .o bject's in parameter 2.
 # ------------------------------------------------------
 define make_dll    =
-	@$(call Write,$(MAKE_CREATE1) DLL $(1) ...)
-	@$(GXX) $(CFLAGS) -shared -fPIC -o $(1) $(2) \
+	@$(ECHO) -e $(MAKE_CREATE1) DLL $(1)
+	$(GXX) $(CFLAGS) -shared -fPIC -o $1 $(2) \
+    -L $(DEV_QTDIR)\lib \
     -lQt5Core    \
     -lQt5Widgets \
-    -lQt5UiTools -lstdc++
+    -lQt5UiTools
 endef
 
 define pas_compile =
-	@$(FPC) $(FPC_FLAGS) -o$(1) $(2)
+	$(FPC) $(FPC_FLAGS) -o$(1) $(2)
 endef
 
 define cc_compile  =
-	@$(GXX) $(CFLAGS) -shared -fPIC -o $(1) -c $(2)
+	$(GXX) $(CFLAGS) $(CINCLUDE) -shared -fPIC -o $(1) -c $(2)
 endef
 
 # ------------------------------------------------------
@@ -224,11 +261,21 @@ $(DLL_DIR)/libqt5_fpc.a: $(DLL_DIR)/qt5_fpc.def ; $(call dll_a,$@,$<)
 # template: compile .pas to .o object file.
 # ---------------------------------------------
 $(PAS_OUT)/qt5/%.o: $(PAS_SRC)/qt5/%.pas ; $(call pas_compile,$@,$<)
+$(PAS_SRC)/qt5/%.pas:      ; @echo "compile: $@"
 
 # ---------------------------------------------
 # template: compile .cc to .o object file.
 # ---------------------------------------------
-$(CPP_OUT)/qt5/%.o: $(CPP_SRC)/qt5/%.cc ; $(call cc_compile,$@,$<)
+$(CPP_OUT)/qt5/%.o: $(CPP_SRC)/qt5/%.cc  ; $(call cc_compile,$@,$<)
+$(CPP_OUT)/vcl/%.o: $(CPP_SRC)/vcl/%.cc  ; $(call cc_compile,$@,$<)
+$(CPP_OUT)/%.o:     $(CPP_SRC)/%.cc      ; $(call cc_compile,$@,$<)
+
+$(CPP_OUT)/%.o:     pas_test/%.cc        ; $(call cc_compile,$@,$<)
+pas_test/%.cc:                           ; @echo "compile: $@"
+
+$(CPP_SRC)/qt5/%.cc:       ; @echo "compile: $@"
+$(CPP_SRC)/vcl/%.cc:       ; @echo "compile: $@"
+$(CPP_SRC)/%.cc:           ; @echo "compile: $@"
 
 # ---------------------------------------------
 # Makefile: default entry point ...
@@ -288,7 +335,7 @@ DIR_FOLDERS = \
     $(OBJ_DIR)/$(PAS_SRC) \
     $(OBJ_DIR)
 
-PRE_FOLDERS = fpc qt5
+PRE_FOLDERS = fpc qt5 vcl
 
 # -------------------------------------------
 # this target, create all temporary files ...
@@ -297,8 +344,7 @@ boot:
 	@$(call Write,$(MAKE_CREATE))
 	@$(foreach folder,$(PRE_FOLDERS),$(MKDIR) $(CPP_OUT)/$(folder) && ) true
 	@$(foreach folder,$(PRE_FOLDERS),$(MKDIR) $(PAS_OUT)/$(folder) && ) true
-	@$(MKDIR) $(OBJ_DIR)/ppunits
-	@$(MKDIR) $(DLL_DIR)
+	@$(MKDIR) -p $(DLL_DIR)/units
 
 # -------------------------------------------
 # this target, remove all temporary files ...
@@ -307,8 +353,7 @@ clean:
 	@$(call Write,$(MAKE_REMOVE))
 	@$(foreach folder,$(PRE_FOLDERS),$(RM) $(CPP_OUT)/$(folder) && ) true
 	@$(foreach folder,$(PRE_FOLDERS),$(RM) $(PAS_OUT)/$(folder) && ) true
-	@$(RM) $(OBJ_DIR)/ppunits
-	@$(RM) $(DLL_DIR)
+	@$(RM) -rf $(DLL_DIR)
 
 # --------------------------------------------------
 # this section describe the locales strings for the
@@ -316,106 +361,17 @@ clean:
 # ENGLISH, and GERMAN
 # --------------------------------------------------
 ifeq ("$(DEV_LANG)","en-US")
-MAKE_LANG    = "Entlish"
-MAKE_ERROR   = "Error"
-MAKE_SUCCESS = "Success"
-MAKE_HASERR  = "build contain error(s) !"
-MAKE_ABORT   = "build process aborted."
-MAKE_WRONGP  = "DEVTERM missing or has wrong parameter."
-MAKE_WELCOME = "Welcome"
-MAKE_CHKSYS  = "check the system for needed settings, and tools ..."
-MAKE_COMNOTE = "compile source code's:"
-MAKE_TMPDIRS = "temp object folders"
-MAKE_CREATE1 = "create"
-MAKE_CREATE  = "$(MAKE_CREATE1) $(MAKE_TMPDIRS) ..."
-MAKE_REMOVE  = "delete $(MAKE_TMPDIRS) crap ..."
-MAKE_DEVENV  = "development environment"
-MAKE_NOSFRM  = "$(NOAUPP) $(MAKE_DEVENV) $(MAKE_FOUND)."
-MAKE_HAVDEV  = "$(MAKE_DEVENV) $(MAKE_FOUND)"
-MAKE_NOCCOMP = "Compiler not $(MAKE_FOUND)"
-MAKE_NOPPDEV = "C++ $(MAKE_NOCCOMP)."
-MAKE_NOCCDEV = "C $(MAKE_NOCCOMP)."
-MAKE_NOSUPP  = "not supported"
-MAKE_FOUND   = "found"
-MAKE_AND     = "and"
-MAKE_DONE    = "done."
-# ---------------------------
-# mapped big   gernan umlauts
-# ---------------------------
-CHAR_BIGAE   = "AE"
-CHAR_BIGOE   = "OE"
-CHAR_BIGUE   = "UE"
-CHAR_BIGSZ   = "SZ"
-# ---------------------------
-# mapped small gernan umlauts
-# ---------------------------
-CHAR_MINAE   = "ae"
-CHAR_MINOE   = "oe"
-CHAR_MINUE   = "ue"
-CHAR_MINSZ   = "sz"
+  include Makefile.xterm
+  include Makefile.ENG
 endif
 ifeq ("$(DEV_LANG)","de-DE")
-MAKE_LANG    = "Deutsch"
-MAKE_ERROR   = "Fehler"
-MAKE_SUCCESS = "Erfolgreich"
-MAKE_HASERR  = "Erstellung enthält Fehler !"
-MAKE_ABORT   = "Erstell-Prozess wurde unterbrochen."
-MAKE_WRONGP  = "DEVTERM fehlt oder hat falsche Parameter."
-MAKE_WELCOME = "Willkommen"
-MAKE_CHKSYS  = "System-Überprüfung auf benötigte Einstellungen und Tools ..."
-MAKE_COMNOTE = "Quelldateien übersetzen:"
-MAKE_OBJDIRS = "temporäre Object-Datei-Verzeichnisse ..."
-MAKE_CREATE1 = "erstelle"
-MAKE_CREATE  = $(MAKE_CREATE1) $(MAKE_OBJDIRS)
-MAKE_REMOVE  = "Lösche" $(MAKE_OBJDIRS)
-MAKE_DEVENV  = "Entwicklungs-Umgebung"
-MAKE_NOSFRM  = "keine unterstütze" $(MAKE_DEVENV) $(MAKE_FOUND)"."
-MAKE_HAVDEV  = $(MAKE_DEVENV) $(MAKE_FOUND)
-MAKE_NOCCOMP = "Compiler $(MAKE_FOUND)."
-MAKE_NOPPDEV = "kein C++ $(MAKE_NOCCOMP)"
-MAKE_NOCCDEV = "kein C $(MAKE_NOCCOMP)"
-MAKE_NOSUPP  = "wird nicht unterstützt"
-MAKE_FOUND   = "gefunden"
-MAKE_AND     = "und"
-MAKE_DONE    = "fertig."
-
-# ----------------------------
-# string place holders ...
-# ----------------------------
-MAKE_SUCCOK  = $(color_info)$(MAKE_OKAY) $(MAKE_HAVDEV)":"  \
-               $(color_white)"$(DEV_OS)"$(MAKE_COMMA)       \
-               "$(DEV_TERM)"$(MAKE_COMMA) $(MAKE_AND)       \
-               $(MAKE_LANG) $(color_normal)
-MAKE_NOCC    = $(call moveback,$(MAKE_NOCCDEV))
-MAKE_NOPP    = $(call moveback,$(MAKE_NOPPDEV))
-
-# ----------------------------
-# unicode big   gernan umlauts
-# ----------------------------
-CHAR_BIGAE  = "\\\u00c4"
-CHAR_BIGOE  = "\\\u00d6"
-CHAR_BIGUE  = "\\\u00dc"
-CHAR_BIGSZ  = "\\\u00df"
-# ----------------------------
-# unicode small gernan umlauts
-# ----------------------------
-CHAR_MINAE  = "\\\u00e4"
-CHAR_MINOE  = "\\\u00f6"
-CHAR_MINUE  = "\\\u00fc"
-CHAR_MINSZ  = "\\\u00df"
+  include Makefile.xterm
+  include Makefile.DEU
 endif
+
 MAKE_NL     = "\\n"
 MAKE_COMMA  = ","
 MAKE_OKAY   = "ok"$(MAKE_COMMA)
-
-# --------------------------------------------------
-# this section describe the terminal colors that you
-# can use, if you have ANSI supported console ...
-# --------------------------------------------------
-color_normal = "\033[0;37;40m"
-color_error  = "\033[1;37;44m"
-color_info   = "\033[1;93;40m"
-color_white  = "\033[1;37;40m"
 
 # --------------------------------------------------
 # this section provide internal use tool functions:
