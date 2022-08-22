@@ -11,6 +11,7 @@ interface
 
 //type Smallint = -32768..32767;
 //type LongWord =      0..4294967295;
+type NativeUInt = 0..18446744073709551615;
 
 type Integer  = SmallInt;
 type SizeInt  = LongInt;
@@ -24,6 +25,9 @@ type CodePointer = Pointer;
 type PShortString = ^ShortString;
 
 type HRESULT  = LongInt;
+
+PChar = ^char;
+PAnsiChar = PChar;
 
 type
 	PJmp_buf = ^jmp_buf;
@@ -219,13 +223,15 @@ type
 procedure fpc_ansistr_decr_ref(Var S : Pointer); compilerproc;
 
 //function  fpc_get_input: PText;         compilerproc;
-//Function  fpc_get_output:PText;         compilerproc;
+Function  fpc_get_output:PText;         compilerproc;
 
 procedure fpc_iocheck;                  compilerproc;
 procedure fpc_readln_end(var f: Text);	compilerproc;
 
+Procedure fpc_Write_Text_ShortStr(Len : Longint;var f : Text;const s : String); compilerproc;
+
 //procedure fpc_write_text_ansistr(var f: Text);       compilerproc;
-//procedure fpc_writeln_end;              compilerproc;
+Procedure fpc_Writeln_End(var f:Text); compilerproc;
 
 Procedure fpc_AnsiStr_Incr_Ref (S : Pointer); compilerproc;
 Procedure fpc_AnsiStr_Assign (Var DestS : Pointer;S2 : Pointer); compilerproc;
@@ -240,10 +246,14 @@ procedure fpc_ReRaise; compilerproc;
 // the following procedure is outsourced in c_crt.c
 // it is called at PASCALMAIN in .exe cute file(s) ...
 // -----------------------------------------------------
-procedure fpc_initializeunits; cdecl; external name 'fpc_initializeunits'; compilerproc;
+procedure fpc_initializeunits; compilerproc;
 procedure fpc_do_exit; compilerproc;
 
 implementation
+
+procedure fpc_initializeunits; compilerproc;
+Begin
+end;
 
 function TVmt.GetvParent: PVMT;
 begin
@@ -255,19 +265,23 @@ begin
 	result := nil;
 end;
 
-(*
 Function fpc_get_output:PText;compilerproc;
 begin
   result := nil;
 end;
 
+Procedure fpc_Write_Text_ShortStr(Len : Longint;var f : Text;const s : String); [Public,Alias:'FPC_WRITE_TEXT_SHORTSTR']; compilerproc;
+Begin
+end;
+
+(*
 procedure fpc_write_text_ansistr;compilerproc;
 begin
 end;*)
 
 Procedure fpc_AnsiStr_Incr_Ref (S : Pointer); compilerproc; begin end;
 Procedure fpc_AnsiStr_Assign (Var DestS : Pointer;S2 : Pointer); compilerproc; begin end;
-procedure fpc_writeln_end;compilerproc;
+Procedure fpc_Writeln_End(var f:Text); compilerproc;
 begin
 end;
 

@@ -1,0 +1,6 @@
+# ignored files ...
+*.ppu
+*.o
+*.bak
+libimp*.a
+src/.out_obj

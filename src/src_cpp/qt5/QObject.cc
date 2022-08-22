@@ -19,6 +19,7 @@
 #include <string.h>
 #include <stdint.h>
 
+namespace FPC {
 // ----------------------------------------------------------------------------
 // global data types ...
 // ----------------------------------------------------------------------------
@@ -34,22 +35,20 @@ typedef DWORD    LongBool;
 typedef BYTE     BOOLEAN ;
 typedef ByteBool BOOL    ;
 
-
-class GNU_QObject: public QObject {
+class QObject: public QObject {
 public:
      BOOL cv_blockSignals;
 public:
-     GNU_QObject(GNU_QObject *parent);
-     GNU_QObject(void);
-    ~GNU_QObject();
+     QObject(QObject *parent);
+     QObject(void);
+    ~QObject();
     
     BOOL GNU_blockSignals(BOOL block);
     BOOL GNU_signalsBlocked(void);
 };
 
-GNU_QObject::GNU_QObject(GNU_QObject *parent)
+QObject::QObject(QObject *parent)
 {
-    __asm__("# GNU_QObject::GNU_QObject(GNU_QObject *parent)");
     if (parent == nullptr) {
         parent  = new GNU_QObject();
     }
@@ -57,26 +56,53 @@ GNU_QObject::GNU_QObject(GNU_QObject *parent)
     printf("zuzu\n");
 }
 
-GNU_QObject::GNU_QObject(void)
+QObject::QObject(void)
 {
-    __asm__("# GNU_QObject::GNU_QObject(void)");
     printf("qobject ctor\n");
 }
 
-GNU_QObject::~GNU_QObject(void) {
+QObject::~QObject(void) {
     __asm__("# GNU_QObject::~GNU_QObject(void)");
 }
 
-BOOL GNU_QObject::GNU_blockSignals(BOOL block) {
-    __asm__("# GNU_QObject::GNU_blockSignals(bool block)");
+BOOL QObject::blockSignals(BOOL block) {
     printf("blockser1: %d\n", block);                // line execute
     cv_blockSignals = block;
     printf("blockser2: %c\n", BOOL(cv_blockSignals));      // line *not* execute
     return cv_blockSignals;
 }
-BOOL GNU_QObject::GNU_signalsBlocked(void) {
-    //__asm__("# GNU_QObject::GNU_signalsBlocked(void)");
+BOOL QObject::signalsBlocked(void) {
     printf("issi: %d\n", cv_blockSignals);
     return cv_blockSignals;
 }
 
+extern "C" void*
+__declspec(dllexport) QObject_Create(void) {
+    printf("ctor () wrapper\n");
+    return nullptr;
+}
+
+extern "C" void*
+__declspec(dllexport) QObject_Create_QObject(void *pptr) {
+    printf("ctor (QObject) wrapper\n");
+    return nullptr;
+}
+
+extern "C" void
+__declspec(dllexport) QObject_Destroy(void) {
+    printf("dtor destructor\n");
+}
+
+extern "C" BOOL
+__declspec(dllexport) QObject_blockSignals(BOOL block) {
+    printf("blocksignals wrapper\n");
+    return true;
+}
+
+extern "C" BOOL
+__declspec(dllexport) QObject_signalsBlocked(BOOL block) {
+    printf("signals wrapper\n");
+    return false;
+}
+
+}  // namespace FPC

@@ -35,6 +35,9 @@ type
     THandle   = NativeUInt;
     HINST     = THandle;
     HMODULE   = HINST;
+
+    ByteBool  = False..Boolean(255);
+
 var
 //    iid  : REFCLSIID;
     hmod : HMODULE;
@@ -46,18 +49,18 @@ function LoadLibrary  (lpLibFileName: PChar): HMODULE; stdcall; external 'kernel
 function LoadLibraryA (lpLibFileName: PChar): HMODULE; stdcall; external 'kernel32.dll' name 'LoadLibraryA';
 function LoadLibraryW (lpLibFileName: PChar): HMODULE; stdcall; external 'kernel32.dll' name 'LoadLibraryW';
 
-//function DllGetClassObject(rciid: REFCLSIID; riid: REFIID; ppv: PPointer): DWORD; cdecl; external 'test1.dll' name 'DllGetClassObject';
-
-//function DLL_init: DWORD; cdecl; external 'qt5_fpc.dll' name 'DLL_init';
+procedure ExitProcess(ACode: DWORD); stdcall; external 'kernel32.dll' name 'ExitProcess';
+function FreeLibrary(ALibModule: HMODULE): ByteBool; stdcall; external 'kernel32.dll' name 'FreeLibrary';
 
 begin
   hmod := LoadLibraryA(PChar('qt5_fpc.dll'));
   if (hmod = 0) then
   begin
     WriteLn('test1.dll not loaded.');
-    Halt(1);
+    ExitProcess(1);
   end;
-//dll_init;
+writeln('xxxxx');
+
 (*
   iid.Data1    := $01020304;
   iid.Data2    := $0102;

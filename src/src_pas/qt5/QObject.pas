@@ -51,12 +51,13 @@ implementation
 // some magic is put in pascal files, and some other magic is put in cpp files.
 // You will need the libraries and other tools from the Qt5 GUI-framework...
 // ----------------------------------------------------------------------------
-function  QObject_Create:                          Pointer ; cdecl; external fpc_qt5Lib name '_ZN11GNU_QObjectC2Ev';
-function  QObject_QObject_Create(parent: QObject): Pointer ; cdecl; external fpc_qt5Lib name '_ZN11GNU_QObjectC2EPS_';
-function  QObject_blockSignals(ABool: ByteBool):   ByteBool; cdecl; external fpc_qt5Lib name '_ZN11GNU_QObject16GNU_blockSignalsEh';
-function  QObject_signalsBlocked:                  ByteBool; cdecl; external fpc_qt5Lib name '_ZN11GNU_QObject18GNU_signalsBlockedEv';
+function  QObject_Create:                  Pointer ;  cdecl; external fpc_qt5Lib name 'QObject_Create';         overload;
+function  QObject_Create(parent: QObject): Pointer ;  cdecl; external fpc_qt5Lib name 'QObject_Create_QObject'; overload;
 
-procedure QObject_Destory(obj: Pointer);                     cdecl; external fpc_qt5Lib name '_ZN11GNU_QObjectD2Ev';
+function  QObject_blockSignals(ABool: ByteBool):   ByteBool; cdecl; external fpc_qt5Lib name 'QObject_blockSignals';
+function  QObject_signalsBlocked:                  ByteBool; cdecl; external fpc_qt5Lib name 'QObject_signalsBlockedEv';
+
+procedure QObject_Destory(obj: Pointer);                     cdecl; external fpc_qt5Lib name 'QObject_Destroy';
 
 const
   cstr_QObject = 'QObject';
@@ -94,7 +95,7 @@ end;
 // ----------------------------------------------------------------------------
 constructor QObject.Create(parent: QObject);
 begin
-  FClassPtr := QObject_QObject_Create(@parent);
+  FClassPtr := QObject_Create_QObject(@parent);
   if FClassPtr = nil then
   begin
     displayError(cstr_QObject);
