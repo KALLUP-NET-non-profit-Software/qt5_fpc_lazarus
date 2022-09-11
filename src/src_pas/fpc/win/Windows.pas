@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// File:        test2.pas
+// File:        Windows.pas
 // Author:      Jens Kallup - paule32 <kallup-dev@web.de>
 // Copyright:   (c) 2022 kallup non-profit
 //
@@ -18,40 +18,11 @@
 //              Please sorry for that !
 // ---------------------------------------------------------------------------
 {$mode delphi}
-program test2;
-uses WinTypes, kernel32, QtApplication, QtWidget;
+unit Windows;
 
-type
-  MyApplication = class(QApplication)
-  private
-    FmyWidget: QWidget;
-  public
-    constructor Create(argc: Integer; argv: Array of PChar);
-    destructor Destroy; override;
-  end;
+interface
+uses WinTypes, kernel32;
 
-constructor MyApplication.Create(argc: Integer; argv: Array of PChar);
+implementation
 begin
-  inherited Create(argc, argv);
-
-  FmyWidget := QWidget.Create;
-  FmyWidget.resize(350,250);
-  FmyWidget.setWindowTitle(PChar('Example'));
-  FmyWidget.show;
-end;
-
-destructor MyApplication.Destroy;
-begin
-  FmyWidget.Free;
-  inherited Destroy;
-end;
-
-var
-  myApp: MyApplication;
-  myArg: Array of PChar;
-  
-begin
-  myApp := MyApplication.Create(ParamCount, myArg);
-  myApp.Execute;
-  myApp.Free;
 end.

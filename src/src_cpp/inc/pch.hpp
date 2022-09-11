@@ -44,10 +44,26 @@
 # include <sstream>
 # include <algorithm>
 # include <functional>
+# include <vector>
 # include <map>
 # include <memory>
 # include <exception>
 # include <typeinfo>
+
+// ---------------------------------------------------------------------------
+// ansi std. c proto type header's ...
+// ---------------------------------------------------------------------------
+# include <stdio.h>
+# include <stdlib.h>
+# include <string.h>
+# include <stdint.h>
+
+// ---------------------------------------------------------------------------
+// library qt5 proto type header's ...
+// ---------------------------------------------------------------------------
+# include <QObject>
+# include <QApplication>
+# include <QWidget>
 
 // ---------------------------------------------------------------------------
 // library c++ proto type header's ...
@@ -56,7 +72,11 @@
 # include <TException.h>
 # include <TClass.h>
 # include <TObject.h>
-
 # include <IUnknown.h>
+
+# include "qtGlobal.h"
+# include "qtObject.h"
+# include "qtApplication.h"
+# include "qtWidget.h"
 
 # endif

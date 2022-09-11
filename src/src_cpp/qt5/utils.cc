@@ -1,5 +1,5 @@
 // ----------------------------------------------------------------------------
-// File:        QObject.cc
+// File:        utils.cc
 // Author:      Jens Kallup - paule32 <kallup-dev@web.de>
 // Copyright:   (c) 2022 kallup non-profit
 //
@@ -14,39 +14,18 @@
 // ----------------------------------------------------------------------------
 # include "pch.hpp"
 
-BEGIN_NAMESPACE(FPC)
-QObject::QObject(QObject *parent){
-    if (parent == nullptr) {
-        parent  = new QObject();
+#if 0
+void* check_pointer(void *ptr) {
+    for (auto& element : FPC::qtContainer) {
+        if (element == ptr) {
+            std::cout << "errrrrr" << std::endl;
+            return ptr;
+        }
     }
-    ptrParent = parent;
+    return nullptr;
 }
-
-QObject::QObject(void){
+void* get_pointer(void *ptr) {
+    void *pc = check_pointer(ptr);
+    return pc;
 }
-
-QObject::~QObject(void) {
-}
-END_NAMESPACE
-
-DLL_EXPORT(void*)
-QObject_Create(void) {
-    std::cout << "ctor QObject" << std::endl;
-    FPC::QObject *ptr = new FPC::QObject();
-    return ptr;
-}
-
-DLL_EXPORT(void*)
-QObject_Create_QObject(void *ptr) {
-    std::cout << "ctor QObject( parent )" << std::endl;
-    FPC::QObject *ptr_ptr = new FPC::QObject(static_cast<FPC::QObject*>(ptr));
-    return ptr_ptr;
-}
-
-DLL_EXPORT(void)
-QObject_Destroy(void *ptr) {
-    std::cout << "dtor QObject" << std::endl;
-    if (ptr != nullptr)
-    delete static_cast<FPC::QObject*>(ptr);
-}
-
+#endif

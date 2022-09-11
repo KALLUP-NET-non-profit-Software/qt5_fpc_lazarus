@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// File:        test2.pas
+// File:        kernel32.pas
 // Author:      Jens Kallup - paule32 <kallup-dev@web.de>
 // Copyright:   (c) 2022 kallup non-profit
 //
@@ -18,40 +18,22 @@
 //              Please sorry for that !
 // ---------------------------------------------------------------------------
 {$mode delphi}
-program test2;
-uses WinTypes, kernel32, QtApplication, QtWidget;
+unit kernel32;
 
-type
-  MyApplication = class(QApplication)
-  private
-    FmyWidget: QWidget;
-  public
-    constructor Create(argc: Integer; argv: Array of PChar);
-    destructor Destroy; override;
-  end;
+interface
+uses WinTypes;
+// ---------------------------------------------------------------------------
+// kernel32 stuff:
+// ---------------------------------------------------------------------------
+const kernel32_dll = 'kernel32.dll';
 
-constructor MyApplication.Create(argc: Integer; argv: Array of PChar);
+function  LoadLibrary  (lpLibFileName: PChar): HMODULE; stdcall; external kernel32_dll name 'LoadLibraryA';
+function  LoadLibraryA (lpLibFileName: PChar): HMODULE; stdcall; external kernel32_dll name 'LoadLibraryA';
+function  LoadLibraryW (lpLibFileName: PChar): HMODULE; stdcall; external kernel32_dll name 'LoadLibraryW';
+
+procedure ExitProcess(ACode: DWORD); stdcall; external kernel32_dll name 'ExitProcess';
+function  FreeLibrary(ALibModule: HMODULE): ByteBool; stdcall; external 'kernel32.dll' name 'FreeLibrary';
+
+implementation
 begin
-  inherited Create(argc, argv);
-
-  FmyWidget := QWidget.Create;
-  FmyWidget.resize(350,250);
-  FmyWidget.setWindowTitle(PChar('Example'));
-  FmyWidget.show;
-end;
-
-destructor MyApplication.Destroy;
-begin
-  FmyWidget.Free;
-  inherited Destroy;
-end;
-
-var
-  myApp: MyApplication;
-  myArg: Array of PChar;
-  
-begin
-  myApp := MyApplication.Create(ParamCount, myArg);
-  myApp.Execute;
-  myApp.Free;
 end.

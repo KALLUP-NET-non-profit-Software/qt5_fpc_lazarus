@@ -1,5 +1,5 @@
 // ----------------------------------------------------------------------------
-// File:        QObject.pas
+// File:        QtObject.pas
 // Author:      Jens Kallup - paule32 <kallup-dev@web.de>
 // Copyright:   (c) 2022 kallup non-profit
 //
@@ -12,13 +12,13 @@
 //              This implementation is not complete. But can be a step,
 //              to depth into the magic of gui programming with FPC-OOP
 // ----------------------------------------------------------------------------
-{$mode delphi}{$H+}
-unit QObject;
+{$mode delphi}
+unit QtObject;
 
 interface
 
 uses
-  QGlobal;
+  QtGlobal;
 
 type
   QClass = class
@@ -32,17 +32,11 @@ type
   // the Qt framework ...
   // ---------------------------------------------
   QObject = class(QClass)
-  private
-    //Sender: QObject;
-    //SenderSignalIndex: Integer;
   public
     constructor Create(parent: QObject); overload;
     constructor Create; overload;
 
     destructor Destroy; override;
-  public
-    function blockSignals(ABool: ByteBool): ByteBool;
-    function signalsBlocked: ByteBool;
   end;
 
 implementation
@@ -53,11 +47,7 @@ implementation
 // ----------------------------------------------------------------------------
 function  QObject_Create:                  Pointer ;  cdecl; external fpc_qt5Lib name 'QObject_Create';         overload;
 function  QObject_Create(parent: QObject): Pointer ;  cdecl; external fpc_qt5Lib name 'QObject_Create_QObject'; overload;
-
-function  QObject_blockSignals(ABool: ByteBool):   ByteBool; cdecl; external fpc_qt5Lib name 'QObject_blockSignals';
-function  QObject_signalsBlocked:                  ByteBool; cdecl; external fpc_qt5Lib name 'QObject_signalsBlockedEv';
-
-procedure QObject_Destory(obj: Pointer);                     cdecl; external fpc_qt5Lib name 'QObject_Destroy';
+procedure QObject_Destory(obj:             Pointer);  cdecl; external fpc_qt5Lib name 'QObject_Destroy';
 
 const
   cstr_QObject = 'QObject';
@@ -95,28 +85,13 @@ end;
 // ----------------------------------------------------------------------------
 constructor QObject.Create(parent: QObject);
 begin
-  FClassPtr := QObject_Create_QObject(@parent);
+  FClassPtr := QObject_Create(@parent);
   if FClassPtr = nil then
   begin
     displayError(cstr_QObject);
     exit;
   end;
   ClassName := cstr_QObject;
-  blockSignals(true);
-  (*if signalsBlocked = false then
-  begin
-    MessageBoxA(0,PChar('xxxxx'),'warning',0)
-  end;*)
-end;
-
-function QObject.blockSignals(ABool: ByteBool): ByteBool;
-begin
-  result := QObject_blockSignals(ABool);
-end;
-
-function QObject.signalsBlocked: ByteBool;
-begin
-  result := QObject_signalsBlocked;
 end;
 
 // ----------------------------------------------------------------------------
@@ -131,6 +106,7 @@ end;
 destructor QObject.Destroy;
 begin
   QObject_Destory(FClassPtr);
+  inherited Destroy;
 end;
 
 begin

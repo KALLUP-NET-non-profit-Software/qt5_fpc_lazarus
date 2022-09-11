@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// File:        test1.cc
+// File:        dll_main.cc
 // Author:      Jens Kallup - paule32 <kallup-dev@web.de>
 // Copyright:   (c) 2022 kallup non-profit
 //
@@ -29,6 +29,7 @@
 using namespace std;
 
 extern void module_test(void);
+static BOOL library_is_initialized = false;
 
 // ---------------------------------------------------------------------------
 // this member function must be visible in the library .def file:
@@ -67,6 +68,7 @@ DLL_init()
     switch (fdwReason) {
         case DLL_PROCESS_ATTACH: {
             std::cout << "attach" << std::endl;
+            library_is_initialized = true;
             module_test();
         }
         break;
@@ -76,8 +78,15 @@ DLL_init()
         break;
         case DLL_PROCESS_DETACH: {
             std::cout << "detach" << std::endl;
+            library_is_initialized = false;
         }
         break;
     }
     return true;
+}
+
+BOOL check_initialize_library(void){
+    if (library_is_initialized)
+    return true ; else
+    return false;        
 }

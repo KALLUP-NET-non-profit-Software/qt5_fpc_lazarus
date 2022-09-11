@@ -1,5 +1,5 @@
 // ----------------------------------------------------------------------------
-// File:        QtGlobal.pas
+// File:        qtObject.h
 // Author:      Jens Kallup - paule32 <kallup-dev@web.de>
 // Copyright:   (c) 2022 kallup non-profit
 //
@@ -12,22 +12,26 @@
 //              This implementation is not complete. But can be a step,
 //              to depth into the magic of gui programming with FPC-OOP
 // ----------------------------------------------------------------------------
-{$mode delphi}{$H+}
-{$typedaddress on}
-unit QGlobal;
+#pragma once
+#ifndef QT_OBJECT_H_
+#define QT_OBJECT_H_
 
-interface
+# include "pch.hpp"
 
-{$IFDEF WINDOWS}
-const fpc_qt5Lib = 'fpc_qt5.dll';
-{$ELSE}
-const fpc_qt5Lib = 'fpc_qt5.so';
-{$ENDIF}
+BEGIN_NAMESPACE(FPC)
+class QObject {
+    QObject *ptrParent;
+public:
+     BOOL cv_blockSignals;
+public:
+     QObject(QObject *parent);
+     QObject(void);
+    ~QObject();
+    
+    BOOL blockSignals(BOOL block);
+    BOOL signalsBlocked(void);
+};
+extern std::vector<QObject*> qtContainer;
+END_NAMESPACE
 
-type
-  bool = Boolean;
-
-implementation
-
-begin
-end.
+#endif

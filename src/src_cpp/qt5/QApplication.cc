@@ -1,5 +1,5 @@
 // ----------------------------------------------------------------------------
-// File:        QObject.cc
+// File:        QApplication.cc
 // Author:      Jens Kallup - paule32 <kallup-dev@web.de>
 // Copyright:   (c) 2022 kallup non-profit
 //
@@ -15,38 +15,35 @@
 # include "pch.hpp"
 
 BEGIN_NAMESPACE(FPC)
-QObject::QObject(QObject *parent){
-    if (parent == nullptr) {
-        parent  = new QObject();
-    }
-    ptrParent = parent;
+QApplication::QApplication(int argc, char **argv)
+{
+    ::std::cout << "ctor QApplication ( argc, argv )" << ::std::endl;
+    qAppPtr = new ::QApplication(argc,argv);
+}
+QApplication::~QApplication(void) {
+    ::std::cout << "dtor QApplication" << ::std::endl;
 }
 
-QObject::QObject(void){
-}
-
-QObject::~QObject(void) {
+int QApplication::Execute(void) {
+    ::std::cout << "Execute" << ::std::endl;
+    
+    return qAppPtr->exec();
 }
 END_NAMESPACE
 
 DLL_EXPORT(void*)
-QObject_Create(void) {
-    std::cout << "ctor QObject" << std::endl;
-    FPC::QObject *ptr = new FPC::QObject();
+QApplication_Create(int argc, char **argv) {
+    FPC::QApplication *ptr = new FPC::QApplication(argc, argv);
     return ptr;
 }
 
-DLL_EXPORT(void*)
-QObject_Create_QObject(void *ptr) {
-    std::cout << "ctor QObject( parent )" << std::endl;
-    FPC::QObject *ptr_ptr = new FPC::QObject(static_cast<FPC::QObject*>(ptr));
-    return ptr_ptr;
-}
-
 DLL_EXPORT(void)
-QObject_Destroy(void *ptr) {
-    std::cout << "dtor QObject" << std::endl;
-    if (ptr != nullptr)
-    delete static_cast<FPC::QObject*>(ptr);
+QApplication_Destroy(void *ptr) {
+    ::std::cout << "dtor QApplication" << ::std::endl;
+    delete static_cast<FPC::QApplication*>(ptr);
 }
 
+DLL_EXPORT(int)
+QApplication_Execute(void *ptr) {
+    return static_cast<FPC::QApplication*>(ptr)->Execute();
+}

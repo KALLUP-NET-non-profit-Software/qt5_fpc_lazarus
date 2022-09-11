@@ -1,5 +1,5 @@
 // ----------------------------------------------------------------------------
-// File:        QObject.cc
+// File:        qtWidget.h
 // Author:      Jens Kallup - paule32 <kallup-dev@web.de>
 // Copyright:   (c) 2022 kallup non-profit
 //
@@ -12,41 +12,23 @@
 //              This implementation is not complete. But can be a step,
 //              to depth into the magic of gui programming with FPC-OOP
 // ----------------------------------------------------------------------------
+#pragma once
+#ifndef QT_WIDGET_H_
+#define QT_WIDGET_H_
+
 # include "pch.hpp"
 
 BEGIN_NAMESPACE(FPC)
-QObject::QObject(QObject *parent){
-    if (parent == nullptr) {
-        parent  = new QObject();
-    }
-    ptrParent = parent;
-}
-
-QObject::QObject(void){
-}
-
-QObject::~QObject(void) {
-}
+class QWidget: public QObject {
+    ::QWidget *qWidgetPtr;
+public:
+    QWidget(void);
+    ~QWidget();
+    
+    void resize(int width, int height);
+    void setWindowTitle(std::string title);
+    void show(void);
+};
 END_NAMESPACE
 
-DLL_EXPORT(void*)
-QObject_Create(void) {
-    std::cout << "ctor QObject" << std::endl;
-    FPC::QObject *ptr = new FPC::QObject();
-    return ptr;
-}
-
-DLL_EXPORT(void*)
-QObject_Create_QObject(void *ptr) {
-    std::cout << "ctor QObject( parent )" << std::endl;
-    FPC::QObject *ptr_ptr = new FPC::QObject(static_cast<FPC::QObject*>(ptr));
-    return ptr_ptr;
-}
-
-DLL_EXPORT(void)
-QObject_Destroy(void *ptr) {
-    std::cout << "dtor QObject" << std::endl;
-    if (ptr != nullptr)
-    delete static_cast<FPC::QObject*>(ptr);
-}
-
+#endif
