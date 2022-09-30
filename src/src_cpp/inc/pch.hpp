@@ -62,8 +62,10 @@
 // library qt5 proto type header's ...
 // ---------------------------------------------------------------------------
 # include <QObject>
+# include <QString>
 # include <QApplication>
 # include <QWidget>
+# include <QMenuBar>
 
 // ---------------------------------------------------------------------------
 // library c++ proto type header's ...
@@ -74,9 +76,14 @@
 # include <TObject.h>
 # include <IUnknown.h>
 
+namespace FPC {
+struct QDummy { };
+}
+
 # include "qtGlobal.h"
 # include "qtObject.h"
 # include "qtApplication.h"
 # include "qtWidget.h"
+# include "qtMenu.h"
 
 # endif

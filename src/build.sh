@@ -18,6 +18,10 @@ OUT_DIR="${SRC_DIR}/.out_obj"
 OUT_PAS="${OUT_DIR}/src_pas"
 OUT_CPP="${OUT_DIR}/src_cpp"
 
+START_DATE="$(date '+%Y-%m-%d')";
+LAST_DATE="$(date '+%Y-%m-%d')";
+CLEAN=false;
+
 # -------------------------------------------------------------------
 # set values
 # -------------------------------------------------------------------
@@ -99,6 +103,22 @@ function compile_fpc() {
 clean
 
 # -------------------------------------------------------------------
+# catch arguments from command line ...
+# -------------------------------------------------------------------
+argc="$*"
+echo "$argc"
+x=0
+for arg in $argc
+do
+    case "$x" in
+        "--" ) echo "invalide opt"; exit 1;;
+        "--clean" ) echo "pupu";;
+        * ) echo "invalid option: $*"; exit 1;;
+    esac
+    x=$arg;
+done
+
+# -------------------------------------------------------------------
 # test case dll
 # -------------------------------------------------------------------
 compile_cpp ${OUT_CPP}/modtest.o   pas_test/modtest.cc
@@ -108,6 +128,7 @@ compile_cpp ${OUT_CPP}/dll_main.o  ${SRC_CPP}/dll_main.cc
 # create dll files ...
 # -------------------------------------------------------------------
 compile_cpp ${OUT_CPP}/qt5/QApplication.o     ${SRC_CPP}/qt5/QApplication.cc
+compile_cpp ${OUT_CPP}/qt5/QMenu.o            ${SRC_CPP}/qt5/QMenu.cc
 compile_cpp ${OUT_CPP}/qt5/QObject.o          ${SRC_CPP}/qt5/QObject.cc
 compile_cpp ${OUT_CPP}/qt5/QWidget.o          ${SRC_CPP}/qt5/QWidget.cc
 compile_cpp ${OUT_CPP}/qt5/utils.o            ${SRC_CPP}/qt5/utils.cc
@@ -124,6 +145,7 @@ echo "build dll ..."
 g++ ${CPP_FLAGS} -o ${OUT_DIR}/x64_exec/qt5_fpc.dll \
     ${OUT_CPP}/qt5/QApplication.o  \
     ${OUT_CPP}/qt5/QObject.o       \
+    ${OUT_CPP}/qt5/QMenu.o         \
     ${OUT_CPP}/qt5/QWidget.o       \
     ${OUT_CPP}/qt5/utils.o         \
     ${OUT_CPP}/vcl/TClass.o        \

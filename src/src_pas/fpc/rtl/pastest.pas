@@ -42,7 +42,7 @@ begin
   
   FmyMenuBar := QMenuBar.Create(FmyWidget);
   FmyMenuBar.show;
-  WriteLn('xxxewrfwew23423423');
+  
   FmyFileMenu := QMenu.Create('File', FmyMenuBar);
   //FmyFileMenu.show;
   

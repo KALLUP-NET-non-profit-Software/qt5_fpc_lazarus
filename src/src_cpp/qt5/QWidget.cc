@@ -23,7 +23,9 @@ QWidget::QWidget(void)
 QWidget::~QWidget(void) {
     ::std::cout << "dtor QWidget" << ::std::endl;
 }
-
+::QWidget QWidget::getOwner() {
+    return qWidgetOwner;
+}
 void QWidget::resize(int width, int height){
     qWidgetPtr->resize(width,height);
 }

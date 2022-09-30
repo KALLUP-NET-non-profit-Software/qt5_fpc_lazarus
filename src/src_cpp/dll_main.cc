@@ -28,9 +28,10 @@
 
 using namespace std;
 
-extern void module_test(void);
+//extern void module_test(void);
 static BOOL library_is_initialized = false;
 
+#if 0
 // ---------------------------------------------------------------------------
 // this member function must be visible in the library .def file:
 // DllGetClassObject PRIVATE
@@ -84,6 +85,7 @@ DLL_init()
     }
     return true;
 }
+#endif
 
 BOOL check_initialize_library(void){
     if (library_is_initialized)

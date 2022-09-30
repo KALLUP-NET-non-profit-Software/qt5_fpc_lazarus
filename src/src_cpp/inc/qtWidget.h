@@ -20,11 +20,14 @@
 
 BEGIN_NAMESPACE(FPC)
 class QWidget: public QObject {
-    ::QWidget *qWidgetPtr;
+      QWidget* qWidgetParent;
+    ::QWidget* qWidgetOwner;
 public:
-    QWidget(void);
-    ~QWidget();
+      QWidget(void);
+     ~QWidget();
     
+    ::QWidget* getOwner() const;
+
     void resize(int width, int height);
     void setWindowTitle(std::string title);
     void show(void);
