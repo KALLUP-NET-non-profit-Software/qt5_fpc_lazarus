@@ -14,7 +14,7 @@ SRC_DIR="."
 SRC_PAS="${SRC_DIR}/src_pas"
 SRC_CPP="${SRC_DIR}/src_cpp"
 
-OUT_DIR="${SRC_DIR}/.out_obj"
+OUT_DIR="${SRC_DIR}/out_obj"
 OUT_PAS="${OUT_DIR}/src_pas"
 OUT_CPP="${OUT_DIR}/src_cpp"
 
