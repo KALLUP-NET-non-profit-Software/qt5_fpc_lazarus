@@ -3,3 +3,4 @@
 *.o
 *.bak
 
+/src/src_pas/fpc/rtl/dll/bak

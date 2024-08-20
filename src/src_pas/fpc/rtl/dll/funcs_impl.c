@@ -1,0 +1,2 @@
+void AnsiCompareStr() { }
+void StrToInt() { }

@@ -1,0 +1,102 @@
+// -----------------------------------------------------------------------
+// TEST.PAS - this file is part of the Objective FPC Runtime.
+//
+// (c) 2022 by Jens Kallup
+// all rights reserved.
+//
+// only for education, and non-profit use !!!
+// -----------------------------------------------------------------------
+{$mode delphi}
+{$smartlink on}
+program test;
+
+uses RTL;
+
+begin
+end.
+
+{$IFDEF DFDFDSFDSSDDSFDSFDSFDSFSDFDSFSDSD}
+(exit)
+;(cond (
+ ;   (> *ex* 0)
+  ;  (print "oookk"))
+   ; (T (print "nok")))
+(print *ex*)
+(exit)
+(handler-case
+    (progn
+    (setq *ex* (probe-file "./quicklisp/"))
+    (cond ((= *ex* nil)
+        (progn
+            (format T "QuickLisp missing, try to install ...~%")
+            (load "quicklisp.lisp")
+            ;(quicklisp-quickstart :install)
+            (format T "done.~%")))
+        (T  (format T "QuickLisp already installed.~%"))
+    )
+    (error (c)
+        (format T "QuickLisp already installed.~%"))))
+
+(exit)
+#-quicklisp
+(let ((quicklisp-init "quicklisp/setup.lisp"))
+  (when (probe-file quicklisp-init)
+    (load quicklisp-init)))
+
+;(with-open-stream (*standard-output* (make-broadcast-stream))
+;    (progn
+;        (ql:quickload :mito)
+;        (ql:quickload '(:qtools :qtcore :qtgui))
+;    )
+;)
+
+(exit)
+(defvar *grammar*)
+(defvar *alist*)
+
+(defvar *i0*)
+(defvar *i1*)
+(defvar *i2*)
+
+(handler-case (progn
+
+(setq *alist*
+    '(
+        (1 . ich)
+        (2 . du)
+
+        (10 . habe)
+        (20 . dich)
+
+        (30 . gefragt)
+    )
+)
+
+(setq *grammar*
+  '((1)
+    (1 10)
+    (1 10 20)
+    (1 10 20 30)))
+
+(setq  *i0* (assoc '1 *grammar*))
+(setq  *i1*
+    (progn
+        (cdr (assoc '1  *alist*  ))
+        (cdr (assoc '10 *alist*  ))
+    )
+)
+
+(setq *i0* '(1 10 20))
+
+(setq *i1* (loop for x in *i0* collect (car (assoc x *alist* ))))
+(setq *i2* (loop for y in *i0* collect (cdr (assoc y *alist* ))))
+
+(print *i1* )
+(print *i2* )
+
+(print (equal '(ich habe dich) *i2*))
+(print (/ 3 0))
+)
+(division-by-zero (c)
+  (format t "Caught division by zero: ~a~%" c)))
+{$ENDIF}
